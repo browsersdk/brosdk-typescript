@@ -34,8 +34,16 @@
     "native",
     "ffi"
   ],
-  "author": "",
+  "author": "BrowserSDK Team",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/browsersdk/brosdk-sdk-typescript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/browsersdk/brosdk-sdk-typescript/issues"
+  },
+  "homepage": "https://github.com/browsersdk/brosdk-sdk-typescript#readme",
   "dependencies": {
     "koffi": "^2.9.0"
   },

@@ -4,3 +4,4 @@ tsconfig.json
 *.log
 .gitignore
 .DS_Store
+.workbuddy/
