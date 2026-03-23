@@ -22,6 +22,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "clean": "rimraf dist",
+    "prepare": "npm run build",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [
