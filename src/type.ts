@@ -11,10 +11,12 @@ export interface InitParam {
 /** 请求返回 */
 export interface SDKResponse {
   /** 0:成功 其他:失败 */
-  code: number
-  /** 
+  code: number;
+  ptr: unknown;
+  len: number;
+  /**
    * 提示信息
    * @description 供参数
    */
-  response: string
+  response: string | null;
 }
