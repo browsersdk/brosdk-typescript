@@ -67,121 +67,61 @@ SDK 会在以下路径自动寻找原生库，**请按平台将对应目录放�
 ## 快速上手
 
 ```typescript
-import BroSDK from 'brosdk-sdk'
+import path from "path";
+import BroSDK from "brosdk-sdk";
+import type { SDKResponse, InitParam } from "brosdk-sdk";
 
-const sdk = new BroSDK()
+const platform = process.platform;
+const arch = process.arch; // 'x64' | 'arm64'
+let sdk: BroSDK;
+let _DLL_PATH = "";
 
-// 注册结果回调（异步操作的结果都通过此回调返回）
-sdk.registerResultCb((code, data) => {
-  console.log('SDK 回调', code, data)
-})
+/** 初始化dll */
+const init = () => {
+  if (platform === "darwin") {
+    const osxDir = arch === "x64" ? "x64-osx" : "arm64-osx";
+    _DLL_PATH = path.join(".", "sdk", osxDir, "brosdk.dylib");
+  } else if (platform === "win32") {
+    const winDir = arch === "arm64" ? "arm64-windows" : "windows-x64";
+    _DLL_PATH = path.join(".", "sdk", winDir, "brosdk.dll");
+  } else {
+    throw new Error(`Unsupported platform: ${platform}`);
+  }
+  sdk = new BroSDK(_DLL_PATH);
+};
+/** 判断 */
+const bind = async (param: InitParam): Promise<SDKResponse> => {
+  const res = await sdk.init(JSON.stringify(param));
+  console.log("res...", initParam, res);
+  return res;
+};
 
-// 注册 Cookie 持久化回调（可选）
-sdk.registerCookiesStorageCb((cookies) => {
-  console.log('收到 cookies', cookies)
-  return null  // 返回 null 表示不修改，直接透传
-})
+init();
 
-// 同步初始化
-const result = sdk.init({ port: 65535, userSig: 'your-user-sig' })
-if (result.code === 0) {
-  console.log('初始化成功', result.response)
-} else {
-  sdk.printErrno('init', result.code)
+const initParam = {
+  port: 65535,
+  userSig:
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyaWQiOiIyMDM3MDg3NTUzMTYwNDgyODE2IiwiYWlkIjoyMDIxNDA0MjkxOTY0NjA0NDE2LCJ1aWQiOjIwMjE0MDI0ODk2NDcwMDk3OTIsImNpZCI6IjUiLCJpc3MiOiJicyIsImV4cCI6MTc3NDYwMDg5NH0.H7G2mCopEJOPiJpbMoBZtdiz_S7qC7Gilh5_dON1Ykc",
+  workDir: path.join(".", "workDir"),
+};
+const bindRes = await bind(initParam);
+const { code } = bindRes;
+if (code === 0) {
+  console.log("绑定成功");
+  console.log(
+    sdk!.browserOpen({
+      envs: [
+        {
+          envId: "2036272570398937088",
+          args: [],
+        },
+      ],
+    }),
+  );
 }
 
-// 使用完毕后释放资源
-sdk.shutdown()
-```
-
----
-
-## 在 Electron IPC 中使用
-
-以下示例展示了如何将 `BroSDK` 封装为一个 IPC 服务类，在 Electron 主进程中响应渲染进程的调用：
-
-```typescript
-import { ipcMain } from 'electron'
-import BroSDK from 'brosdk-sdk'
-
-interface IResponse {
-  code: number
-  msg: string
-}
-
-export default class SDK {
-  private bindStatus = false
-  private broSDK: BroSDK
-
-  constructor() {
-    this.broSDK = new BroSDK()
-
-    ipcMain.handle('app-bind',          this.init)
-    ipcMain.handle('app-token-update',  this.tokenUpdate)
-    ipcMain.handle('app-browser-open',  this.browserOpen)
-    ipcMain.handle('app-browser-close', this.browserClose)
-    ipcMain.handle('app-shutdown',      this.shutdown)
-  }
-
-  /** 初始化 SDK，绑定账户 */
-  init = async (_event, data: { userSig: string }): Promise<IResponse> => {
-    const initParam = {
-      port: 65535,
-      userSig: data.userSig
-    }
-
-    // 注册 Cookie 持久化回调
-    this.broSDK.registerCookiesStorageCb((cookies) => {
-      console.log('cookies:', cookies)
-      return null
-    })
-
-    const res = this.broSDK.init(JSON.stringify(initParam))
-    console.log('init result:', res)
-
-    if (res.code === 0) {
-      this.bindStatus = true
-      // 手动释放 SDK 分配的输出缓冲区
-      this.broSDK.freePointer(res.ptr)
-    }
-
-    return {
-      code: res.code,
-      msg: res.code === 0 ? 'Initialization successful.' : 'Initialization failed.'
-    }
-  }
-
-  /** 更新 Token */
-  tokenUpdate = async (_event, data: object): Promise<IResponse> => {
-    const code = this.broSDK.tokenUpdate(JSON.stringify(data))
-    return { code, msg: '' }
-  }
-
-  /** 打开浏览器环境 */
-  browserOpen = async (_event, data: object): Promise<IResponse> => {
-    console.log('启动环境', data)
-    const code = this.broSDK.browserOpen(JSON.stringify(data))
-    return { code, msg: '' }
-  }
-
-  /** 关闭浏览器环境 */
-  browserClose = async (_event, data: object): Promise<IResponse> => {
-    console.log('关闭环境', data)
-    const code = this.broSDK.browserClose(data)
-    return { code, msg: '' }
-  }
-
-  /** 关闭 SDK，释放所有资源 */
-  shutdown = async (_event): Promise<IResponse | void> => {
-    if (!this.bindStatus) return
-
-    const code = this.broSDK.shutdown()
-    if (code === 0) {
-      this.bindStatus = false
-    }
-    return { code, msg: '' }
-  }
-}
+// 防止程序自动退出
+process.stdin.resume();
 ```
 
 ---
