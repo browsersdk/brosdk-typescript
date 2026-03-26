@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { app } from 'electron'
-import path from 'path'
+// import { app } from 'electron'
+// import path from 'path'
 import koffi from 'koffi'
 
 /* ============================================================
@@ -8,7 +8,7 @@ import koffi from 'koffi'
    ============================================================ */
 
 export default class BroSDK {
-  _DLL_PATH: string | undefined
+  // _DLL_PATH: string | undefined
   #lib: koffi.IKoffiLib
 
   /* ============================================================
@@ -62,26 +62,30 @@ export default class BroSDK {
   #cookiesStorageCb: Function | null = null
   #nativeCookiesCb: koffi.IKoffiRegisteredCallback | null = null
 
-  constructor() {
-    const platform = process.platform
-    const arch = process.arch // 'x64' | 'arm64'
+  /**
+   * 
+   * @param path dll 路径
+   */
+  constructor(path: string) {
+    // const platform = process.platform
+    // const arch = process.arch // 'x64' | 'arm64'
 
-    if (platform === 'darwin') {
-      // macOS：arm64 优先；若有 x64 发行版，可按 arch 选择目录
-      const osxDir = arch === 'x64' ? 'x64-osx' : 'arm64-osx'
-      this._DLL_PATH = !app.isPackaged
-        ? path.join(app.getAppPath(), 'sdk', osxDir, 'brosdk.dylib')
-        : path.join(process.resourcesPath, 'sdk', osxDir, 'brosdk.dylib')
-    } else if (platform === 'win32') {
-      const winDir = arch === 'arm64' ? 'arm64-windows' : 'windows-x64'
-      this._DLL_PATH = !app.isPackaged
-        ? path.join(app.getAppPath(), 'sdk', winDir, 'brosdk.dll')
-        : path.join(process.resourcesPath, 'sdk', winDir, 'brosdk.dll')
-    } else {
-      throw new Error(`Unsupported platform: ${platform}`)
-    }
+    // if (platform === 'darwin') {
+    //   // macOS：arm64 优先；若有 x64 发行版，可按 arch 选择目录
+    //   const osxDir = arch === 'x64' ? 'x64-osx' : 'arm64-osx'
+    //   this._DLL_PATH = !app.isPackaged
+    //     ? path.join(app.getAppPath(), 'sdk', osxDir, 'brosdk.dylib')
+    //     : path.join(process.resourcesPath, 'sdk', osxDir, 'brosdk.dylib')
+    // } else if (platform === 'win32') {
+    //   const winDir = arch === 'arm64' ? 'arm64-windows' : 'windows-x64'
+    //   this._DLL_PATH = !app.isPackaged
+    //     ? path.join(app.getAppPath(), 'sdk', winDir, 'brosdk.dll')
+    //     : path.join(process.resourcesPath, 'sdk', winDir, 'brosdk.dll')
+    // } else {
+    //   throw new Error(`Unsupported platform: ${platform}`)
+    // }
 
-    this.#lib = koffi.load(this._DLL_PATH)
+    this.#lib = koffi.load(path)
 
     // ---------- 回调类型原型 ----------
     // koffi 在非 Windows 平台上忽略 __cdecl，跨平台安全
