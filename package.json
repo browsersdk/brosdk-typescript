@@ -1,5 +1,5 @@
 {
-  "name": "brosdk-sdk",
+  "name": "brosdk",
   "version": "1.0.0",
   "description": "TypeScript/Node.js SDK wrapper for BroSDK native dynamic library (Windows/macOS)",
   "type": "module",
@@ -37,12 +37,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/browsersdk/brosdk-sdk-typescript.git"
+    "url": "git+https://github.com/browsersdk/brosdk-typescript.git"
   },
   "bugs": {
-    "url": "https://github.com/browsersdk/brosdk-sdk-typescript/issues"
+    "url": "https://github.com/browsersdk/brosdk-typescript/issues"
   },
-  "homepage": "https://github.com/browsersdk/brosdk-sdk-typescript#readme",
+  "homepage": "https://github.com/browsersdk/brosdk-typescript#readme",
   "dependencies": {
     "koffi": "^2.9.0"
   },

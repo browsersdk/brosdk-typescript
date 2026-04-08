@@ -1,4 +1,4 @@
-# brosdk-sdk
+# brosdk
 
 > BroSDK 的 TypeScript / Node.js 封装，通过 [koffi](https://koffi.dev/) 调用原生动态库（Windows `.dll` / macOS `.dylib`），专为 Electron 主进程设计。
 
@@ -34,7 +34,7 @@
 ## 安装
 
 ```bash
-npm install brosdk-sdk
+npm install brosdk
 ```
 
 `koffi` 是运行时依赖，会随包自动安装。`electron` 由宿主应用提供，无需重复安装。
@@ -69,8 +69,8 @@ npm install brosdk-sdk
 
 ```typescript
 import path from "path";
-import BroSDK from "brosdk-sdk";
-import type { SDKResponse, InitParam } from "brosdk-sdk";
+import BroSDK from "brosdk";
+import type { SDKResponse, InitParam } from "brosdk";
 
 const platform = process.platform;
 const arch = process.arch; // 'x64' | 'arm64'
@@ -172,7 +172,7 @@ const sdk = new BroSDK('动态库文件路径')
 同步初始化 SDK。**初始化成功后，SDK 会启动一个 HTTP 服务，监听端口为初始化参数中指定的 `port`**。
 
 ```typescript
-import type { SDKResponse, InitParam } from "brosdk-sdk";
+import type { SDKResponse, InitParam } from "brosdk";
 
 const param: InitParam =  {
   port: 65535,
